@@ -1,4 +1,4 @@
-import { Contract, utils, BigNumber } from "ethers";
+import { Contract, Interface, parseUnits, toBigInt } from "ethers";
 import { _getProvider } from "./ethereum";
 import WOOLF_ABI from "./abi/woolf.abi";
 import BARN_ABI from "./abi/barn.abi";
@@ -13,14 +13,14 @@ export const mint = async (stake, tokens, paid) => {
 
     const signer = provider.getSigner();
     const contract = new Contract(process.env.REACT_APP_WOOLF, WOOLF_ABI, signer);
-    const ethCost = utils.parseUnits(MINT_PRICE, "ether").mul(BigNumber.from(tokens));
+    const ethCost = parseUnits(MINT_PRICE, "ether") * toBigInt(tokens);
 
     const gasEstimate = await contract.estimateGas.mint(tokens, {
-        value: paid ? ethCost : BigNumber.from(0),
+        value: paid ? ethCost : toBigInt(0),
     });
     return await contract.mint(tokens, {
-        gasLimit: gasEstimate.mul(BigNumber.from(12)).div(BigNumber.from(10)),
-        value: paid ? ethCost : BigNumber.from(0),
+        gasLimit: gasEstimate * toBigInt(12) / toBigInt(10),
+        value: paid ? ethCost : toBigInt(0),
     });
 };
 
@@ -31,7 +31,7 @@ export const mintWithJoe = async (tokens) => {
     const contract = new Contract(process.env.REACT_APP_WOOLF, WOOLF_ABI, signer);
     const gasEstimate = await contract.estimateGas.mintWithJoeToken(tokens);
     return await contract.mintWithJoeToken(tokens, {
-        gasLimit: gasEstimate.mul(BigNumber.from(12)).div(BigNumber.from(10)),
+        gasLimit: gasEstimate * toBigInt(12) / toBigInt(10),
     });
 };
 
@@ -42,13 +42,13 @@ export const mintWithTractor = async (tokens) => {
     const contract = new Contract(process.env.REACT_APP_WOOLF, WOOLF_ABI, signer);
     const gasEstimate = await contract.estimateGas.mintWithTractorToken(tokens);
     return await contract.mintWithTractorToken(tokens, {
-        gasLimit: gasEstimate.mul(BigNumber.from(12)).div(BigNumber.from(10)),
+        gasLimit: gasEstimate * toBigInt(12) / toBigInt(10),
     });
 };
 
 export const parseMint = (staked, receipt) => {
-    const woolf = new utils.Interface(WOOLF_ABI);
-    const barn = new utils.Interface(BARN_ABI);
+    const woolf = new Interface(WOOLF_ABI);
+    const barn = new Interface(BARN_ABI);
 
     const results = {};
 
@@ -61,7 +61,7 @@ export const parseMint = (staked, receipt) => {
                 stake: true,
             };
             continue;
-        } catch (e) {}
+        } catch (e) { }
         try {
             const log = woolf.parseLog(receipt.logs[x]);
             results[log.args.tokenId.toString()] = {
@@ -69,7 +69,7 @@ export const parseMint = (staked, receipt) => {
                 recipient: log.args.to,
                 stake: false,
             };
-        } catch (e) {}
+        } catch (e) { }
     }
 
     return results;

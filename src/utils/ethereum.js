@@ -1,4 +1,4 @@
-import { providers, utils } from "ethers";
+import { BrowserProvider, formatUnits } from "ethers";
 import { useEffect, useState } from "react";
 
 export const _isMetaMaskInstalled = () => {
@@ -9,7 +9,7 @@ export const _isMetaMaskInstalled = () => {
 
 export const _getProvider = () => {
   if (!_isMetaMaskInstalled()) return null;
-  return new providers.Web3Provider(window.ethereum);
+  return new BrowserProvider(window.ethereum);
 };
 
 export const _getChain = async () => {
@@ -111,7 +111,7 @@ export const watchTransaction = (txHash, callback) => {
 //   if (!bn) return 0;
 //   try {
 //     return numberWithCommas(
-//       parseFloat(utils.formatUnits(bn)).toFixed(decimals)
+//       parseFloat(formatUnits(bn)).toFixed(decimals)
 //     );
 //   } catch (e) {
 //     return bn;
@@ -122,7 +122,7 @@ export const parseBigNumber = (bn, decimals = 2) => {
   if (!bn) return 0;
   try {
     return numberWithCommas(
-      parseFloat(utils.formatUnits(bn, "gwei")).toFixed(decimals)
+      parseFloat(formatUnits(bn, "gwei")).toFixed(decimals)
     );
   } catch (e) {
     return bn;

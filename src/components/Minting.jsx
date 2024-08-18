@@ -12,7 +12,7 @@ import { watchTransaction } from "../utils/ethereum";
 // import { decodeTokenURI, isSheep } from '../utils/uri'
 import { decodeTokenURI } from "../utils/uri";
 // import MintNStakeModal from './MintNStakeModal'
-import { utils, BigNumber } from "ethers";
+import { formatUnits, parseUnits, toBigInt } from "ethers";
 
 // todo: change these prices in woolf.js as well
 const PLACEHOLDER =
@@ -168,15 +168,15 @@ const Minting = ({ wallet, chain, stats, reload, woolBalance }) => {
     };
 
     const ethCost = () => {
-        return utils.formatUnits(utils.parseUnits(MINT_PRICE, "gwei").mul(BigNumber.from(amount)), "gwei") + " AVAX";
+        return formatUnits(parseUnits(MINT_PRICE, "gwei") * toBigInt(amount), "gwei") + " AVAX";
     };
 
     const tractorCost = () => {
-        return utils.formatUnits(utils.parseUnits(TRACTOR_PRICE, "gwei").mul(BigNumber.from(amount)), "gwei") + " TRACTOR";
+        return formatUnits(parseUnits(TRACTOR_PRICE, "gwei") * toBigInt(amount), "gwei") + " TRACTOR";
     };
 
     const joeCost = () => {
-        return utils.formatUnits(utils.parseUnits(JOE_PRICE, "ether").mul(BigNumber.from(amount)), "ether") + " JOE";
+        return formatUnits(parseUnits(JOE_PRICE, "ether") * toBigInt(amount), "ether") + " JOE";
     };
 
     const woolCost = (tokenId) => {
@@ -200,7 +200,7 @@ const Minting = ({ wallet, chain, stats, reload, woolBalance }) => {
     const preCheck = () => {
         if (requiresEth()) return undefined;
         if (!woolBalance || woolBalance === "?") return "Insufficient $aWOOL";
-        if (utils.parseUnits("" + totalWoolCost(), "gwei").gt(woolBalance)) return "Insufficient $aWOOL";
+        if (parseUnits("" + totalWoolCost(), "gwei") > woolBalance) return "Insufficient $aWOOL";
         return undefined;
     };
 

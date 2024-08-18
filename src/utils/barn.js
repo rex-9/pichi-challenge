@@ -1,4 +1,4 @@
-import { Contract, utils, BigNumber } from "ethers";
+import { Contract, Interface, toBigInt } from "ethers";
 import { _getProvider } from "./ethereum";
 import BARN_ABI from "./abi/barn.abi";
 
@@ -12,7 +12,7 @@ export const stake = async (account, tokenIds) => {
     tokenIds
   );
   return await contract.addManyToBarnAndPack(account, tokenIds, {
-    gasLimit: gasEstimate.mul(BigNumber.from(12)).div(BigNumber.from(10)),
+    gasLimit: gasEstimate * toBigInt(12) / toBigInt(10),
   });
 };
 
@@ -26,12 +26,12 @@ export const claim = async (tokenIds, unstake) => {
     unstake
   );
   return await contract.claimManyFromBarnAndPack(tokenIds, unstake, {
-    gasLimit: gasEstimate.mul(BigNumber.from(12)).div(BigNumber.from(10)),
+    gasLimit: gasEstimate * toBigInt(12) / toBigInt(10),
   });
 };
 
 export const parseClaims = (receipt) => {
-  const barn = new utils.Interface(BARN_ABI);
+  const barn = new Interface(BARN_ABI);
   const claims = [];
   receipt.logs.forEach((log) => {
     try {
